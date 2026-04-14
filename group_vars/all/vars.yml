@@ -12,3 +12,8 @@ vlans:
   - id: 99
     name: "NATIVE"
     description: "Native VLAN trunk"
+
+# VLAN ajouté pour la DMZ (exercice PR)
+  - id: 50
+    name: "DMZ"
+    description: "Zone démilitarisée"
