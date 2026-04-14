@@ -1,0 +1,55 @@
+---
+name: "NetOps CI/CD Pipeline"
+
+on:
+  push:
+    branches: ["main", "feature/**"]   # Déclenché sur push main et feature branches
+  pull_request:
+    branches: ["main"]                 # Déclenché sur PR vers main
+
+jobs:
+  lint:
+    name: "Stage 1 - Lint"
+    runs-on: ubuntu-latest             # Runner GitHub (Ubuntu, Python préinstallé)
+    steps:
+      - name: "Checkout du dépôt"
+        uses: actions/checkout@v4      # Action officielle : clone le repo dans le runner
+
+      - name: "Installer les dépendances"
+        run: pip install yamllint ansible-lint
+
+      - name: "yamllint"
+        run: yamllint .                # Identique à pipeline.sh stage 1
+
+      - name: "ansible-lint"
+        run: ansible-lint playbooks/   # Identique à pipeline.sh stage 1
+
+  dry-run:
+    name: "Stage 2 - Dry-run"
+    runs-on: ubuntu-latest
+    needs: lint                        # Ne démarre que si le job lint est OK
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Installer Ansible"
+        run: pip install ansible
+
+      - name: "Dry-run --check --diff"
+        run: ansible-playbook --check --diff playbooks/site.yml
+
+  deploy:
+    name: "Stage 3 - Deploy"
+    runs-on: ubuntu-latest
+    needs: dry-run                     # Ne démarre que si le job dry-run est OK
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Déploiement uniquement sur push vers main (pas sur PR ni feature branches)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Installer Ansible"
+        run: pip install ansible
+
+      - name: "Déploiement production"
+        run: ansible-playbook playbooks/site.yml
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.VAULT_PASSWORD }}  # Secret GitHub chiffré
