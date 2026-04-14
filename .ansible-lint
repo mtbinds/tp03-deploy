@@ -1,0 +1,27 @@
+---
+# Profil : moderate (équilibre lab/formation)
+# Alternatives : min, basic, moderate, safety, shared, production
+profile: moderate
+
+# Exclure les dossiers non-contrôlés
+exclude_paths:
+  - .git/
+  - collections/     # Collections installées localement (ansible-galaxy install)
+  - .cache/          # Cache Ansible (facts cachés entre exécutions)
+
+# Règles à désactiver si elles sont trop strictes pour le lab
+skip_list:
+  - yaml[truthy]       # Déjà géré par yamllint (évite le doublon)
+  - name[missing]      # Certaines tasks de debug n'ont pas de name
+
+# Règles à traiter comme des warnings (non-bloquantes)
+warn_list:
+  - experimental
+  - no-changed-when   # Acceptable en lab pour les tasks shell ponctuelles
+
+# Variables définies en dehors d'Ansible (injectées par CI)
+extra_vars:
+  lab_name: "ci-pipeline"    # Évite "variable undefined" sur les vars CI
+
+# Vérifier aussi les collections installées
+use_default_rules: true

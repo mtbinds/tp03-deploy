@@ -1,0 +1,30 @@
+---
+extends: default    # Hérite du profil "default" (35 règles) puis surcharge ci-dessous
+
+rules:
+  # Longueur de ligne : 160 car les playbooks Ansible sont verbeux
+  line-length:
+    max: 160
+    level: warning    # warning = non-bloquant (pipeline continue)
+
+  # Indentation : 2 espaces (standard Ansible)
+  indentation:
+    spaces: 2
+    indent-sequences: true       # Les listes YAML (- item) s'indentent aussi
+    check-multi-line-strings: false
+
+  # Commentaires : espace requis après #
+  comments:
+    min-spaces-from-content: 1   # "# commentaire" OK, "#commentaire" KO
+
+  # Lignes vides : max 2 consécutives
+  empty-lines:
+    max: 2
+
+  # Truthy : accepter true/false en minuscule (standard Ansible)
+  truthy:
+    allowed-values: ['true', 'false']   # "True"/1/"yes" refusés
+    check-keys: false
+
+  # Fichiers : doit commencer par ---
+  document-start: enable    # Obligatoire pour tous les fichiers YAML Ansible

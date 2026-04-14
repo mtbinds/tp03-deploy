@@ -1,0 +1,35 @@
+---
+- name: Validation du lab NetOps
+  hosts: localhost
+  gather_facts: false   # Pas besoin de facts système pour un lab de validation pure
+  vars_files:
+    - ../group_vars/all/vars.yml
+
+  tasks:
+    - name: Afficher les informations du lab
+      ansible.builtin.debug:
+        # Variables interpolées depuis group_vars/all/vars.yml
+        msg: "Lab: {{ lab_name }} v{{ lab_version }} - Env: {{ netops_env }}"
+
+    - name: Valider la structure des VLANs
+      ansible.builtin.assert:
+        that:
+          - item.id is defined               # Le champ "id" existe dans le dict
+          - item.id | int >= 1               # id >= 1 (VLAN 0 réservé)
+          - item.id | int <= 4094            # id <= 4094 (standard 802.1Q)
+          - item.name is defined             # Le champ "name" existe
+          - item.name | length > 0           # name n'est pas une chaîne vide
+        fail_msg: "VLAN invalide : {{ item }}"
+        success_msg: "VLAN {{ item.id }} ({{ item.name }}) - OK"
+      loop: "{{ vlans }}"         # Itère sur la liste vlans de group_vars/all/vars.yml
+      loop_control:
+        label: "VLAN {{ item.id }}"   # Affiche "VLAN 10" au lieu du dict complet dans les logs
+
+    - name: Générer le rapport de configuration
+      ansible.builtin.debug:
+        msg: |
+          ===== RAPPORT DE CONFIGURATION =====
+          Lab     : {{ lab_name }}
+          Version : {{ lab_version }}
+          VLANs   : {{ vlans | length }} configurés   {# | length = len(vlans) #}
+          =====================================

@@ -1,0 +1,6 @@
+*.retry            # Fichiers de retry Ansible (hôtes ayant échoué)
+.cache/            # Cache Ansible (facts, etc.)
+collections/       # Collections installées localement (ansible-galaxy)
+__pycache__/       # Cache Python bytecode
+*.pyc              # Fichiers Python compilés
+.vault_pass        # Fichier mot de passe Vault (JAMAIS dans Git)

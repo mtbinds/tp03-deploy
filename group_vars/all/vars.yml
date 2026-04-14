@@ -1,0 +1,14 @@
+---
+lab_name: "tp03-pipeline"
+lab_version: "1.0.0"
+netops_env: "lab"
+vlans:
+  - id: 10
+    name: "MGMT"
+    description: "Management VLAN"
+  - id: 20
+    name: "PROD"
+    description: "Production VLAN"
+  - id: 99
+    name: "NATIVE"
+    description: "Native VLAN trunk"
